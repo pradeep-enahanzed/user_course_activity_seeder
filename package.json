@@ -1,0 +1,16 @@
+{
+  "name": "user_course_activity_migration",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "data:import": "node seeder.js -i"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "mongoose": "^6.10.0"
+  }
+}
