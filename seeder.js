@@ -10,6 +10,7 @@ mongoose.connect(process.env.MONGO_URI, (err) => {
 // Loads models
 const Course = require("./models/course");
 const UserCourseActivity = require("./models/userCourseActivity");
+const { Cohort } = require("./models/cohort");
 
 // Creates default cohorts for each course.
 const userCourseActivityCollection = async () => {
@@ -56,8 +57,53 @@ const userCourseActivityCollection = async () => {
     ];
 
     // first creating default cohorts for all the courses.
-    const data = await Course.aggregate(courseAggregationPipeline);
-    console.log("Data Imported...", data);
+    await Course.aggregate(courseAggregationPipeline);
+
+    // Use the Aggregation Pipeline to transform the data in the original collection to match the new schema
+    const cohortAggregationPipeline = [
+      {
+        $project: {
+          // Transform fields from old schema to new schema
+          _id: 0,
+          cohort_id: "$_id",
+          course_id: "$courseId",
+          data: "$learners",
+        },
+      },
+      {
+        $unwind: "$data",
+      },
+      {
+        $set: {
+          // Transform fields from old schema to new schema
+          userId: "$data.user",
+          type: "learner",
+          progress: "$data.progress",
+          isCertificateGererated: "$data.isCertificateGererated",
+          certificateURL: "$data.certificateURL",
+          certificateDate: "$data.certificateDate",
+          certificateDateISO: {
+            $toDate: "$data.certificateDate",
+          },
+          certificateVerificationCode: "$data.certificateVerificationCode",
+          containers: "$data.containers",
+          failedContainers: "$data.failedContainers",
+          created_at: "$data.created_at",
+          updated_at: "$data.updated_at",
+        },
+      },
+      {
+        $unset: ["data"],
+      },
+      {
+        $merge: {
+          into: "user_course_activities",
+        },
+      },
+    ];
+
+    await Cohort.aggregate(cohortAggregationPipeline);
+    // console.log("Data Imported...", data);
     process.exit();
   } catch (err) {
     console.error(err);
