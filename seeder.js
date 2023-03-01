@@ -52,7 +52,7 @@ const userCourseActivityCollection = async () => {
         $unset: ["data"],
       },
       {
-        $out: "user_course_activities", // Write the transformed data to a new collection
+        $out: "usercourseactivities", // Write the transformed data to a new collection
       },
     ];
 
@@ -97,7 +97,7 @@ const userCourseActivityCollection = async () => {
       },
       {
         $merge: {
-          into: "user_course_activities",
+          into: "usercourseactivities",
         },
       },
     ];
@@ -113,7 +113,8 @@ const userCourseActivityCollection = async () => {
 // Delete data
 const deleteData = async () => {
   try {
-    await UserCourseActivity.deleteMany();
+    const res = await UserCourseActivity.deleteMany();
+    console.log(res);
     console.log("Data Destroyed...");
     process.exit();
   } catch (err) {
