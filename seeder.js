@@ -10,7 +10,7 @@ mongoose.connect(process.env.MONGO_URI, (err) => {
 // Loads models
 const Course = require("./models/course");
 const UserCourseActivity = require("./models/userCourseActivity");
-const { Cohort } = require("./models/cohort");
+const  {Cohort}  = require("./models/cohort");
 
 // Creates default cohorts for each course.
 const userCourseActivityCollection = async () => {
@@ -32,9 +32,10 @@ const userCourseActivityCollection = async () => {
       {
         $set: {
           // Transform fields from old schema to new schema
-          userId: "$data.user",
+          user_id: "$data.user",
           type: "learner",
           progress: "$data.progress",
+          status: "enrolled",
           isCertificateGererated: "$data.isCertificateGererated",
           certificateURL: "$data.certificateURL",
           certificateDate: "$data.certificateDate",
@@ -53,7 +54,7 @@ const userCourseActivityCollection = async () => {
         $unset: ["data"],
       },
       {
-        $out: "usercourseactivities", // Write the transformed data to a new collection
+        $out: "usercourseactivities_v2", // Write the transformed data to a new collection
       },
     ];
 
@@ -77,9 +78,10 @@ const userCourseActivityCollection = async () => {
       {
         $set: {
           // Transform fields from old schema to new schema
-          userId: "$data.user",
+          user_id: "$data.user",
           type: "learner",
           progress: "$data.progress",
+          status: "enrolled",
           isCertificateGererated: "$data.isCertificateGererated",
           certificateURL: "$data.certificateURL",
           certificateDate: "$data.certificateDate",
@@ -99,7 +101,7 @@ const userCourseActivityCollection = async () => {
       },
       {
         $merge: {
-          into: "usercourseactivities",
+          into: "usercourseactivities_v2",
         },
       },
     ];
